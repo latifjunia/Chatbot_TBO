@@ -1,6 +1,6 @@
 import re
 
-class OrderParser:
+class NLPEngine:  # Ganti dari OrderParser menjadi NLPEngine
     def __init__(self):
         # Database Menu dengan Info Tambahan untuk UI
         self.menu_data = {
@@ -12,30 +12,21 @@ class OrderParser:
 
         # Regex Patterns
         self.re_number = r"\b(\d+)\b"
-        # Membuat pola regex dinamis dari keys menu
         menu_keys = "|".join(self.menu_data.keys())
         self.re_menu = rf"\b({menu_keys})\b"
-        self.re_split = r"[.,]+|\bdan\b|\&"  # Pemisah kalimat (koma, titik, 'dan', '&')
+        self.re_split = r"[.,]+|\bdan\b|\&"
 
-        # Regex untuk pembatalan/pengurangan
         self.re_cancel_all = r"\b(batalkan semua|hapus semua|reset keranjang|kosongkan)\b"
         self.re_reduce = r"\b(batalkan|kurangi|tidak jadi|hapus|cancel)\b"
 
     def _parse_single_segment(self, text):
-        """Helper untuk memproses satu potongan kalimat (misal: '2 teh')"""
         text = text.lower().strip()
-
-        # 1. Cari Item
         item_match = re.search(self.re_menu, text)
         if not item_match:
             return None
-
         item_key = item_match.group(1)
-
-        # 2. Cari Jumlah (Default 1)
         qty_match = re.search(self.re_number, text)
         qty = int(qty_match.group(1)) if qty_match else 1
-
         return {
             "item": item_key,
             "qty": qty,
@@ -44,19 +35,13 @@ class OrderParser:
         }
 
     def parse_orders(self, full_text):
-        """
-        Memecah kalimat majemuk: "pesan teh 2, espresso 2"
-        Menjadi list orders.
-        """
         segments = re.split(self.re_split, full_text)
-
         found_orders = []
         for segment in segments:
             if segment.strip():
                 order = self._parse_single_segment(segment)
                 if order:
                     found_orders.append(order)
-
         return found_orders
 
     def detect_intent(self, text):
@@ -79,4 +64,3 @@ class OrderParser:
 
     def print_menu(self):
         print(self.menu_data)
-
