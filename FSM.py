@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from engine import NLPEngine
+from engine import Engine as NLPEngine
 
 class State(Enum):
     IDLE = auto()
