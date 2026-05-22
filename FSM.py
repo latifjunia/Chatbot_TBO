@@ -7,7 +7,7 @@ class State(Enum):
     CONFIRMATION = auto()
     PAYMENT = auto()
 
-class CoffeeFSM:
+class FSM:  # Ganti nama class dari CoffeeFSM menjadi FSM
     def __init__(self):
         self.state = State.IDLE
         self.nlp = NLPEngine()
@@ -33,7 +33,6 @@ class CoffeeFSM:
         found = False
         message = ""
 
-        # Cart Item di cart
         for item in self.cart:
             if item['item'] == item_to_reduce:
                 item['qty'] -= qty_to_remove
@@ -53,29 +52,21 @@ class CoffeeFSM:
         user_input = user_input.strip()
         intent = self.nlp.detect_intent(user_input)
 
-        # GLOBAL RESET SYSTEM
         if intent == "RESET_SYSTEM":
             self.__init__()
             self.response = "Sistem di-reset total. Halo! Mau pesan apa?"
             return
 
-        # STATE LOGIC: IDLE
         if self.state == State.IDLE:
             self.state = State.ORDERING
             self.response = "Halo! Mau pesan apa hari ini? Ketik 'menu' untuk melihat pilihan."
 
-        # STATE LOGIC: ORDERING
         elif self.state == State.ORDERING:
-            # FITUR: Tanya Menu
             if intent == "ASK_MENU":
                 self.response = self.get_menu_text()
-
-            # FITUR: Batalkan Semua
             elif intent == "CANCEL_ALL":
                 self.cart = []
                 self.response = "Keranjang telah dikosongkan. Mau pesan yang lain?"
-
-            # FITUR: Kurangi/Batalkan Item Tertentu
             elif intent == "REDUCE_ITEM":
                 items_to_remove = self.nlp.parse_orders(user_input)
                 if items_to_remove:
@@ -86,26 +77,20 @@ class CoffeeFSM:
                     self.response = "\n".join(results)
                 else:
                     self.response = "Item apa yang ingin dibatalkan? Contoh: *'batalkan 1 kopi'*."
-
-            # FITUR: Checkout Keranjang
             elif intent == "CHECKOUT":
                 if not self.cart:
                     self.response = "Keranjang masih kosong."
                 else:
                     self.state = State.CONFIRMATION
                     self.response = f"Total: **Rp {self.calculate_total():,}**. Lanjutnya bayar? (Ya/Tidak)"
-
             else:
-                # Logika Penambahan Pesanan
                 new_orders = self.nlp.parse_orders(user_input)
                 if new_orders:
                     for order in new_orders:
-                        # Cek jika item sudah ada, tambah qty saja
                         existing = next((i for i in self.cart if i['item'] == order['item']), None)
                         if existing:
                             existing['qty'] += order['qty']
                         else:
-                            # Ambil info harga & emoji dari menu_data
                             menu_info = self.nlp.menu_data[order['item']]
                             order.update({"price": menu_info['price'], "emoji": menu_info['emoji']})
                             self.cart.append(order)
@@ -113,19 +98,17 @@ class CoffeeFSM:
                 else:
                     self.response = "Maaf, saya tidak mengerti. Coba: **pesan 2 kopi** atau **hapus 1 kopi**."
 
-        # STATE LOGIC: CONFIRMATION
         elif self.state == State.CONFIRMATION:
             intent = self.nlp.detect_intent(user_input)
             if intent == "YES":
                 self.state = State.PAYMENT
-                self.step()  # Auto-step
+                self.step()
             elif intent == "NO":
                 self.state = State.ORDERING
                 self.response = "Oke, silakan tambah pesanan lagi."
             else:
                 self.response = "Jawab 'Ya' atau 'Tidak'."
 
-        # STATE LOGIC: PAYMENT
         elif self.state == State.PAYMENT:
             total = self.calculate_total()
             self.response = f"Terima kasih! Pembayaran Rp {total:.2f} diterima. Pesanan diproses."
