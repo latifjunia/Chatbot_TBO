@@ -80,17 +80,3 @@ class OrderParser:
     def print_menu(self):
         print(self.menu_data)
 
-
-# Contoh penggunaan
-if __name__ == "__main__":
-    parser = OrderParser()
-    
-    # Tes parse_orders
-    print(parser.parse_orders("pesan teh 2, espresso 1"))
-    
-    # Tes detect_intent
-    print(parser.detect_intent("saya mau reset"))
-    print(parser.detect_intent("tampilkan menu"))
-    
-    # Tes print_menu
-    parser.print_menu()
