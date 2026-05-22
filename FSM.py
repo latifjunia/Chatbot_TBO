@@ -7,7 +7,7 @@ class State(Enum):
     CONFIRMATION = auto()
     PAYMENT = auto()
 
-class FSM:  # Ganti nama class dari CoffeeFSM menjadi FSM
+class CoffeeFSM:
     def __init__(self):
         self.state = State.IDLE
         self.nlp = NLPEngine()
@@ -21,15 +21,13 @@ class FSM:  # Ganti nama class dari CoffeeFSM menjadi FSM
         return sum(item['price'] * item['qty'] for item in self.cart)
     
     def get_menu_text(self):
-        """Fungsi bantuan untuk merangkai teks daftar menu"""
-        teks_menu = "**]f Daftar Menu Logic Coffee:**\n\n"
+        teks_menu = "🍵 **Daftar Menu Logic Coffee:**\n\n"
         for key, data in self.nlp.menu_data.items():
             teks_menu += f"- {data['emoji']} **{key.capitalize()}** (Rp {data['price']:,}): *{data['desc']}*\n"
         teks_menu += "\nSilakan ketik pesanan Anda (contoh: *'Pesan 2 teh, 1 espresso'*)."
         return teks_menu
 
     def reduce_cart(self, item_to_reduce, qty_to_remove):
-        """Logika untuk mengurangi qty item atau menghapusnya jika qty <= 0"""
         found = False
         message = ""
 
@@ -39,7 +37,7 @@ class FSM:  # Ganti nama class dari CoffeeFSM menjadi FSM
                 found = True
                 if item['qty'] <= 0:
                     self.cart.remove(item)
-                    message = f"X **{item_to_reduce}** telah dihapus dari keranjang."
+                    message = f"❌ **{item_to_reduce}** telah dihapus dari keranjang."
                 else:
                     message = f"☹️ **{item_to_reduce}** dikurangi {qty_to_remove}. Sisa: {item['qty']}."
                 break
@@ -99,7 +97,6 @@ class FSM:  # Ganti nama class dari CoffeeFSM menjadi FSM
                     self.response = "Maaf, saya tidak mengerti. Coba: **pesan 2 kopi** atau **hapus 1 kopi**."
 
         elif self.state == State.CONFIRMATION:
-            intent = self.nlp.detect_intent(user_input)
             if intent == "YES":
                 self.state = State.PAYMENT
                 self.step()
@@ -111,5 +108,5 @@ class FSM:  # Ganti nama class dari CoffeeFSM menjadi FSM
 
         elif self.state == State.PAYMENT:
             total = self.calculate_total()
-            self.response = f"Terima kasih! Pembayaran Rp {total:.2f} diterima. Pesanan diproses."
+            self.response = f"Terima kasih! Pembayaran Rp {total:,.0f} diterima. Pesanan diproses."
             self.state = State.IDLE
