@@ -1,6 +1,6 @@
 import re
 
-class Engine:
+class NLPEngine:
     def __init__(self):
         # Data harga (Bisa berupa dict, database, atau API)
         self.menu_data = {
