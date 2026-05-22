@@ -1,5 +1,5 @@
 import streamlit as st
-from FSM import FSM
+from FSM import CoffeeFSM  # Ubah dari "from FSM import FSM" menjadi "from FSM import CoffeeFSM"
 
 st.set_page_config(page_title="Logic Coffee Bot", page_icon="📖", layout="wide")
 
@@ -15,7 +15,7 @@ st.markdown("""<style>
 """, unsafe_allow_html=True)
 
 if 'bot' not in st.session_state:
-    st.session_state.bot = CoffeeFSM()
+    st.session_state.bot = CoffeeFSM()  # Sudah benar
     st.session_state.bot.step()
     st.session_state.history = [{"role": "assistant", "content": st.session_state.bot.get_response()}]
 
