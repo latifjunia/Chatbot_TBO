@@ -1,5 +1,5 @@
 import streamlit as st
-from coffee_fsm import FSM
+from FSM import FSM
 
 st.set_page_config(page_title="Logic Coffee Bot", page_icon="📖", layout="wide")
 
