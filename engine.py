@@ -1,6 +1,6 @@
 import re
 
-class NLPEngine:  # Ganti dari OrderParser menjadi NLPEngine
+class NLPEngine:
     def __init__(self):
         # Database Menu dengan Info Tambahan untuk UI
         self.menu_data = {
