@@ -21,16 +21,17 @@ class CoffeeFSM:
         return sum(item['price'] * item['qty'] for item in self.cart)
 
     def get_menu_text(self):
-        """Fungsi bantuan untuk merangkai teks daftar menu"""
-        teks_menu = "**Daftar Menu Logic Coffee:**\n\n"
-        for key, data in self.nlp.menu_data.items():
-            # Asumsi data memiliki properti emoji, harga, dan desc
-            emoji = data.get('emoji', '☕')
-            desc = data.get('desc', 'Pilihan nikmat')
-            teks_menu += f"- {emoji} **{key.capitalize()}** (Rp {data['price']:,}): *{desc}*\n"
-        
-        teks_menu += "\nSilakan ketik pesanan Anda (contoh: *'Pesan 2 teh, 1 espresso'*)."
-        return teks_menu
+    """Fungsi bantuan untuk merangkai teks daftar menu"""
+    teks_menu = "**Daftar Menu Logic Coffee:**\n\n"
+    for key, data in self.nlp.menu_data.items():
+        if "harga" in data:
+            teks_menu += f"- ☕ **{key.capitalize()}** (Rp {data['harga']:,})\n"
+        elif "variasi" in data:
+            variasi_str = ", ".join(data["variasi"])
+            teks_menu += f"- ☕ **{key.capitalize()}** (Rp {data['harga']:,}): *{variasi_str}*\n"
+    
+    teks_menu += "\nSilakan ketik pesanan Anda (contoh: *'Pesan 2 teh, 1 espresso'*)."
+    return teks_menu
     def reduce_cart(self, item_to_reduce, qty_to_remove):
         """Logika untuk mengurangi qty item atau menghapusnya jika qty <= 0"""
         found = False
